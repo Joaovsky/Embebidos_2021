@@ -1,0 +1,55 @@
+%Initialize Q table
+Q_table = [0 0 0;0 0 0;0 0 0;0 0 0;0 0 0;0 0 0;0 0 0];
+%Randomize Q initial values
+Q_table = randn(size(Q_table));
+%Set initial parameters
+Action = 1;
+Gama = 0.9;%0.9
+Epsilon = 0.5;%0.8
+Learn_rate = 0.7;%0.7
+Total_episodes = 100;%100
+Episode_reward = 0;
+max_q = 0;
+Start_ep_decaying =1;
+End_ep_decaying = fix(Total_episodes/2);
+Epsilon_decay_val = Epsilon / (End_ep_decaying-Start_ep_decaying);
+%Loop for each episode
+for episode=1:Total_episodes
+%Set new initial current and reference temperatures 
+init_cur_temp = (27-15)*rand + 15;
+ref_temp = round((27-15)*rand + 15);
+%Initialize S
+[cur_temp, cs, r] = environment(Action,init_cur_temp, ref_temp);
+%Loop for each step of the episode
+while(1)
+%Choose A from S using policy derived from Q using 
+probability = rand;
+if rand > Epsilon
+    [Chosen_value,Action] = max((Q_table(cs,:))');
+else
+    Action = randi(width(Q_table));
+end
+%Take action A, observe R, S'
+[cur_temp, ns, r] = environment(Action,cur_temp, ref_temp);
+Episode_reward = Episode_reward+r;
+%Determine max Q value of given action and next state
+[max_q] = max((Q_table(ns,:))');
+%Update Q value from current state and action
+Q_table(cs,Action) = (1-Learn_rate)*Q_table(cs,Action) + Learn_rate*(reward(cs,Action) + Gama*max_q);
+%S <- S'
+cs = ns;
+%If S = 1, temperature converged, break
+if cs == 1
+    break;
+end
+end
+if End_ep_decaying >= episode >= Start_ep_decaying
+    Epsilon = Epsilon - Epsilon_decay_val;%0.8
+end
+hold on
+plot(episode, Episode_reward/episode, 'c+', episode, cur_temp, 'o');
+%Plot(episode, cur_temp, 'o');
+end
+hold off
+%Save QTable with otimized values
+save('QTablev15.mat','Q_table');

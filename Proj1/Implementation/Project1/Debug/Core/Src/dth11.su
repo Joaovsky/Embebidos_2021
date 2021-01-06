@@ -1,0 +1,6 @@
+dth11.c:14:6:start_start_sign	4	static
+dth11.c:29:6:stop_start_sign	4	static
+dth11.c:48:6:stop_sign	4	static
+dth11.c:54:6:verifyData	32	static
+dth11.c:98:9:getHumm	24	static
+dth11.c:112:7:getTemp	32	static

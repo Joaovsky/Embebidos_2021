@@ -1,0 +1,8 @@
+tsl2561.c:26:6:enable	16	static
+tsl2561.c:37:6:disable	16	static
+tsl2561.c:47:6:getData	24	static
+tsl2561.c:66:6:TSL2561_Init	24	static
+tsl2561.c:95:6:TSL2561_setIntegrationTime	16	static
+tsl2561.c:118:6:TSL2561_setGain	16	static
+tsl2561.c:145:6:TSL2561_getLuminosity	24	static
+tsl2561.c:182:10:TSL2561_calculateLux	56	static

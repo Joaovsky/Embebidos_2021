@@ -1,0 +1,4 @@
+hc05.c:35:6:verifyConnection	8	static
+hc05.c:44:6:send_bth	24	static
+hc05.c:52:6:receive_bth	16	static
+hc05.c:108:6:actual_data	4	static

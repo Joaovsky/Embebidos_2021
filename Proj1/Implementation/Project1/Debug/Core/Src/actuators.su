@@ -1,0 +1,5 @@
+actuators.c:19:6:actuate_light	16	static
+actuators.c:28:6:actuate_fan	16	static
+actuators.c:37:6:actuate_heating	16	static
+actuators.c:45:9:getPWM_fan	4	static
+actuators.c:50:9:getPWM_heating	4	static

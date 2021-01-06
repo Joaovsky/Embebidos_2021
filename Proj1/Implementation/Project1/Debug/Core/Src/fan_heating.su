@@ -1,0 +1,4 @@
+fan_heating.c:19:6:actuate_fan	16	static
+fan_heating.c:28:6:actuate_heating	16	static
+fan_heating.c:36:9:getPWM_fan	4	static
+fan_heating.c:40:9:getPWM_heating	4	static

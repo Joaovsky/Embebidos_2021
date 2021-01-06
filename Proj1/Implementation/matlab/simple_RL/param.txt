@@ -1,0 +1,9 @@
+Action = 1;
+Gama = 0.9;
+Epsilon = 1;
+Learn_rate = 1;
+Total_episodes = 100;
+Episode_reward = 0;
+max_q = 0;
+
+Diverge para ref_temp >=23

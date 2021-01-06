@@ -1,0 +1,14 @@
+freertos.c:122:6:vApplicationGetIdleTaskMemory	24	static
+freertos.c:135:6:vApplicationGetTimerTaskMemory	24	static
+freertos.c:149:6:MX_FREERTOS_Init	384	static
+freertos.c:267:6:StartTaskRunning	16	static
+freertos.c:286:6:StartTaskSendInfo	24	static
+freertos.c:382:6:StartTaskProcessInfo	16	static
+freertos.c:412:6:StartTaskAquireTemp	24	static
+freertos.c:454:6:StartTaskAquireBright	24	static
+freertos.c:488:6:StartTaskSetSecureMode	16	static
+freertos.c:510:6:StartTaskRlControl	16	static
+freertos.c:535:6:StartTaskLightActuator	16	static
+freertos.c:550:6:Callback_Fast_Timer	16	static
+freertos.c:562:6:Callback_Slow_Timer	16	static
+freertos.c:572:6:Callback_Sampling_Timer	16	static

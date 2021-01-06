@@ -1,0 +1,22 @@
+2021-01-05 10:26:45,156 [INFO] Activator:170 - 
+
+
+2021-01-05 10:26:45,161 [INFO] Activator:171 - !SESSION log4j initialized
+2021-01-05 10:26:50,678 [ERROR] ApiDbMcu:1471 - Can't use Application install path:
+2021-01-05 10:26:52,974 [WARN] RulesReader:54 - Compatibility file://mcu/compatibility.xml not found
+2021-01-05 10:32:25,164 [INFO] Activator:170 - 
+
+
+2021-01-05 10:32:25,168 [INFO] Activator:171 - !SESSION log4j initialized
+2021-01-05 10:32:26,839 [ERROR] ApiDbMcu:1471 - Can't use Application install path:
+2021-01-05 10:32:29,119 [WARN] RulesReader:54 - Compatibility file://mcu/compatibility.xml not found
+2021-01-05 11:10:44,756 [INFO] Activator:170 - 
+
+
+2021-01-05 11:10:44,762 [INFO] Activator:171 - !SESSION log4j initialized
+2021-01-05 11:10:46,552 [ERROR] ApiDbMcu:1471 - Can't use Application install path:
+2021-01-05 11:10:48,844 [WARN] RulesReader:54 - Compatibility file://mcu/compatibility.xml not found
+2021-01-05 12:02:08,038 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] Artifact repository out of sync. Overwriting C:\ST\STM32CubeIDE_1.5.0\STM32CubeIDE\features\com.st.stm32cube.common.feature.mx_6.1.1.202012091304
+2021-01-05 12:02:08,093 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] Artifact repository out of sync. Overwriting C:\ST\STM32CubeIDE_1.5.0\STM32CubeIDE\features\com.st.stm32cube.common.feature.mx.stinsider_6.1.1.202012091304
+2021-01-05 12:02:08,745 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] Artifact repository out of sync. Overwriting C:\ST\STM32CubeIDE_1.5.0\STM32CubeIDE\features\com.st.stm32cube.ide.feature.mcu.rcp_1.5.1.202012101225
+2021-01-05 12:02:08,754 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] Artifact repository out of sync. Overwriting C:\ST\STM32CubeIDE_1.5.0\STM32CubeIDE\features\com.st.stm32cube.ide.feature.mcu.analytics_1.5.1.202012101225

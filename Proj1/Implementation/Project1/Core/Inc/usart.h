@@ -1,0 +1,66 @@
+/**
+  ******************************************************************************
+  * @file    usart.h
+  * @brief   This file contains all the function prototypes for
+  *          the usart.c file
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                             www.st.com/SLA0044
+  *
+  ******************************************************************************
+  */
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __USART_H__
+#define __USART_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
+/* USER CODE BEGIN Includes */
+#include <stdbool.h>
+/* USER CODE END Includes */
+
+extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart3;
+
+/* USER CODE BEGIN Private defines */
+
+/* USER CODE END Private defines */
+
+void MX_USART2_UART_Init(void);
+void MX_USART3_UART_Init(void);
+
+/* USER CODE BEGIN Prototypes */
+extern uint8_t Rx_Uart2[16];
+extern uint8_t Rx_Uart3[16];
+extern uint8_t Rx_Uart2_index;
+extern uint8_t Rx_Uart3_index;
+
+extern uint8_t uart2_received_flag;
+extern uint8_t uart3_received_flag;
+
+void init_UART2(void);
+void init_UART3(void);
+bool send_uart3(uint8_t *str);
+bool receive_uart3(void);
+
+/* USER CODE END Prototypes */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __USART_H__ */
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,0 +1,3 @@
+dc_motor.c:24:6:start_motor	4	static
+dc_motor.c:33:6:stop_motor	4	static
+dc_motor.c:39:6:verify_motor	4	static
