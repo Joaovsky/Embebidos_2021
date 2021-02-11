@@ -34,8 +34,9 @@ triggered = 0
 prototxt_path = "MobileNetSSD_deploy.prototxt"
 model_path = "MobileNetSSD_deploy.caffemodel"
 file_video = "cutcartest.mp4"
-img = Image.open('collision_avoidance.png')
+img = Image.open('../app_python/images/signs/collision_avoidance.png')
 net = cv.dnn.readNetFromCaffe(prototxt_path, model_path)
+
 
 def process_frame_MobileNetSSD(next_frame):
     rgb = cv.cvtColor(next_frame, cv.COLOR_BGR2RGB)
@@ -57,18 +58,10 @@ def process_frame_MobileNetSSD(next_frame):
             (startX, startY, endX, endY) = box.astype("int")
             #find screen dimensions
             if ((endX - startX)>0.3*W)and((0.3*W)<((endX+startX)/2)<(0.7*W)):
-                global pix
-                pix = QPixmap("collision_avoidance.png")
+                pix = QPixmap('../app_python/images/signs/collision_avoidance.png')
                 win.CollisionWarningLabel.setPixmap(pix)
                 win.Sign_show.clear()
-                timer = QTimer()
-                global triggered
-                if triggered == 0:
-                    triggered = 1
-                    os.system('aplay ../app_python/images/audio_signs/collision_warning.wav')
-                    timer.timeout.connect(lambda:win.CollisionWarningLabel.clear())
-                    timer.start(2000)
-
+                timer.start()
     return next_frame
 
 def VehicheDetection_UsingMobileNetSSD(filename):
@@ -254,14 +247,45 @@ def process_done_signal(result):
         win.Sign_show.setPixmap(pix)
         #print(result)
 
+
+
+class Timer1(QThread):
+    #deteçao de sinal
+    done_signal = pyqtSignal(str)
+    def __init__(self):
+        self.var = 0
+        QThread.__init__(self)
+    def run(self):
+        # Do some work here
+        while True:
+            if self.var==2:
+                self.var = 0
+                win.CollisionWarningLabel.clear()
+            self.var += 1
+            QThread.msleep(1000)
+"""   
+        if True:
+            self.done_signal.emit('Signal')
+        if True:
+            self.done_signal.emit('Obstacle')
+        else:
+            QThread.msleep(10)
+"""
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = Ui()
 
+    #signal
+    #signal startTimer();
+    #signal
+    #signal stopTimer();
+
     task1 = MyTask1()
     task2 = MyTask2()
     task3 = MyTask3()
-    task4 = MyTask4()
+    timer = Timer1()
+    #task4 = MyTask4()
     #print(list_ports.comports())
     task1.done_signal.connect(process_done_signal)
     task1.start()
@@ -269,8 +293,8 @@ if __name__ == '__main__':
     task2.start()
     task3.done_signal.connect(process_done_signal)
     task3.start()
-    task4.done_signal.connect(process_done_signal)
-    task4.start()
+    #task4.done_signal.connect(process_done_signal)
+    #task4.start()
     app.exec_()
     while 1:
         time.sleep(0.001)
