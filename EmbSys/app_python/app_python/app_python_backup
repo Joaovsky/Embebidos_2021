@@ -20,6 +20,7 @@ import math
 import numpy as np
 import time
 from PIL import Image
+#from playsound import playsound
 import os
 
 mode=0
@@ -33,7 +34,7 @@ triggered = 0
 prototxt_path = "MobileNetSSD_deploy.prototxt"
 model_path = "MobileNetSSD_deploy.caffemodel"
 file_video = "cutcartest.mp4"
-img = Image.open('../app_python/signs/collision_avoidance.png')
+img = Image.open('../app_python/images/signs/collision_avoidance.png')
 net = cv.dnn.readNetFromCaffe(prototxt_path, model_path)
 
 img1 = cv.imread('30_test.png')
@@ -43,22 +44,6 @@ img4 = cv.imread('stop_test.png')
 
 img_array = [img1,img2,img3,img4]
 img_index = 0
-
-img_vid1 = cv.imread('vid00001.png')
-img_vid2 = cv.imread('vid00003.png')
-img_vid3 = cv.imread('vid00005.png')
-img_vid4 = cv.imread('vid00007.png')
-img_vid5 = cv.imread('vid00009.png')
-img_vid6 = cv.imread('vid00011.png')
-img_vid7 = cv.imread('vid00013.png')
-img_vid8 = cv.imread('vid00015.png')
-img_vid9 = cv.imread('vid00017.png')
-img_vid10 = cv.imread('vid00019.png')
-img_vid11 = cv.imread('vid00021.png')
-img_vid12 = cv.imread('vid00023.png')
-
-img_vid_array = [img_vid1,img_vid2,img_vid3,img_vid4,img_vid5,img_vid6,img_vid7,img_vid8,img_vid9,img_vid10,img_vid11,img_vid12]
-img_vid_index = 0
 
 #############################################
 frameWidth= 640         # CAMERA RESOLUTION
@@ -90,12 +75,9 @@ def process_frame_MobileNetSSD(next_frame):
             (startX, startY, endX, endY) = box.astype("int")
             #find screen dimensions
             if ((endX - startX)>0.3*W)and((0.3*W)<((endX+startX)/2)<(0.7*W)):
-                pix = QPixmap('../app_python/signs/collision_avoidance.png')
+                pix = QPixmap('../app_python/images/signs/collision_avoidance.png')
                 win.CollisionWarningLabel.setPixmap(pix)
-                win.collision_label.setText('Collision Warning')
-                os.system(f'aplay ../app_python/signs/sound.wav')
                 win.Sign_show.clear()
-                win.Sign_label.clear()
                 timer.start()
     return next_frame
 
@@ -135,28 +117,6 @@ def VehicheDetection_UsingMobileNetSSD(filename):
     #cv.destroyAllWindows()
     #out.release()
 
-label_array = ['Speed Limit 30 km/h', 'Stop', 'No entry', 'Bumpy road', 'Roundabout', 'Speed Limit 50 km/h', 'No passing']
-
-def grayscale(img):
-    img = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
-    return img
-def equalize(img):
-    img =cv.equalizeHist(img)
-    return img
-def preprocessing(img):
-    img = grayscale(img)
-    img = equalize(img)
-    img = img/255
-    return img
-#def getCalssName(classNo):
-    if   classNo == 0: return label_array[0]
-    elif classNo == 1: return label_array[1]
-    elif classNo == 2: return label_array[2]
-    elif classNo == 3: return label_array[3]
-    elif classNo == 4: return label_array[4]
-    elif classNo == 5: return label_array[5]
-    elif classNo == 6: return label_array[6]
-
 class Ui(QtWidgets.QMainWindow):
     mode=0
     def __init__(self):
@@ -168,6 +128,7 @@ class Ui(QtWidgets.QMainWindow):
         self.auto_btn.clicked.connect(self.btn_auto_pressed)
         self.ref_light_slider.valueChanged.connect(self.slider_ref_changed)
         self.show()
+
     def btn_more_pressed(self):
         global setpoint
         setpoint +=1
@@ -263,6 +224,7 @@ class MyTask2(QThread):
             QThread.msleep(10)
             #self.done_signal.emit('Task2 ends')
 
+
 class MyTask3(QThread):
     #deteçao de obstaculo
     done_signal = pyqtSignal(str)
@@ -270,37 +232,13 @@ class MyTask3(QThread):
         QThread.__init__(self)
     def run(self):
         # Do some work here
-        global img_vid_array
-        global img_vid_index
-        while True:
-            process_frame_MobileNetSSD(img_vid_array[img_vid_index])
-            img_vid_index = (img_vid_index + 1) % len(img_vid_array)
-            QThread.msleep(1000)
-
-def process_signs_frame_CNN(self):
-    # PROCESS IMAGE
-    cap2 = img_array[img_index]
-    img = np.asarray(cap2)
-    img = cv.resize(img, (32, 32))
-    img = preprocessing(img)
-    img = img.reshape(1, 32, 32, 1)
-    # PREDICT IMAGE
-    predictions = model.predict(img)
-    classIndex = model.predict_classes(img)
-    probabilityValue = np.amax(predictions)
-    if probabilityValue > threshold:
-        signs_path = '../app_python/signs/' + str(classIndex)[1] + '/img.png'
-        audio_path = f'aplay ../app_python/signs/' + str(classIndex)[1] + '/sound.wav'
-        win.Sign_label.setText(label_array[int(str(classIndex)[1])])
-        pix = QPixmap(signs_path)
-        win.Sign_show.setPixmap(pix)
-        os.system(audio_path)
-
-def process_done_signal(result):
-    pix= QPixmap("../app_python/test.jpg")
-    if result == 'Foto': #se já tirou foto->avaliar se é sinal/ obstaculo
-        shutil.copy2('../app_python/test.jpg','../app_python/foto.jpg')
-        win.Sign_show.setPixmap(pix)
+        VehicheDetection_UsingMobileNetSSD(file_video)
+        if True:
+            self.done_signal.emit('Signal')
+        if True:
+            self.done_signal.emit('Obstacle')
+        else:
+            QThread.msleep(10)
 
 class MyTask4(QThread):
     #deteçao de sinal
@@ -308,13 +246,39 @@ class MyTask4(QThread):
     def __init__(self):
         QThread.__init__(self)
     def run(self):
+        # Do some work here
         # READ IMAGE
-        global img_array
-        global img_index
-        while True:
-            process_signs_frame_CNN(self)
-            img_index = (img_index + 1) % len(img_array)
-            QThread.msleep(1000)
+        cap = img_array[img_index]
+        img_index = (img_index + 1) % len(img_array)
+        # PROCESS IMAGE
+        img = np.asarray(cap)
+        img = cv.resize(img, (32, 32))
+        img = preprocessing(img)
+        img = img.reshape(1, 32, 32, 1)
+        # PREDICT IMAGE
+        predictions = model.predict(img)
+        classIndex = model.predict_classes(img)
+        probabilityValue = np.amax(predictions)
+        if probabilityValue > threshold:
+            print(getCalssName(classIndex))
+        #VehicheDetection_UsingMobileNetSSD(file_video)
+        if True:
+            self.done_signal.emit('Signal')
+        if True:
+            self.done_signal.emit('Obstacle')
+        else:
+            QThread.msleep(10)
+
+def process_done_signal(result):
+    pix= QPixmap("../app_python/test.jpg")
+    if result == 'Foto': #se já tirou foto->avaliar se é sinal/ obstaculo
+        #task2.done_signal.connect(process_done_signal)
+        #task2.start()
+        shutil.copy2('../app_python/test.jpg','../app_python/foto.jpg')
+        win.Sign_show.setPixmap(pix)
+        #print(result)
+
+
 
 class Timer1(QThread):
     #deteçao de sinal
@@ -328,23 +292,43 @@ class Timer1(QThread):
             if self.var==2:
                 self.var = 0
                 win.CollisionWarningLabel.clear()
-                win.collision_label.clear()
             self.var += 1
             QThread.msleep(1000)
+"""   
+        if True:
+            self.done_signal.emit('Signal')
+        if True:
+            self.done_signal.emit('Obstacle')
+        else:
+            QThread.msleep(10)
+"""
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = Ui()
+
+    #signal
+    #signal startTimer();
+    #signal
+    #signal stopTimer();
+
     task1 = MyTask1()
     task2 = MyTask2()
     task3 = MyTask3()
-    task4 = MyTask4()
     timer = Timer1()
+    #task4 = MyTask4()
+    #print(list_ports.comports())
+    task1.done_signal.connect(process_done_signal)
     task1.start()
+    #task2.done_signal.connect(process_done_signal)
     task2.start()
+    task3.done_signal.connect(process_done_signal)
     task3.start()
-    task4.start()
+    #task4.done_signal.connect(process_done_signal)
+    #task4.start()
     app.exec_()
     while 1:
         time.sleep(0.001)
+        #print(usb_serial.readline())
+
     sys.exit()
