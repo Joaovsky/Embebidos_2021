@@ -1,0 +1,71 @@
+import cv2 as cv
+import tensorflow as tf
+import numpy as np
+import time
+#from tensorflow.python.client import device_lib
+import datetime
+from PIL import Image
+#img = Image.open('collision_avoidance.png')
+gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.5)
+sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
+
+img1 = cv.imread('30_test.png')
+img2 = cv.imread('no_entry_test.png')
+img3 = cv.imread('roundabout_mandatory_test.png')
+img4 = cv.imread('stop_test.png')
+
+img_array = [img1,img2,img3,img4]
+img_index = 0
+
+#print(device_lib.list_local_devices())
+#print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+#print("GPU device: ", tf.test.gpu_device_name())
+
+#############################################
+frameWidth= 640         # CAMERA RESOLUTION
+frameHeight = 480
+brightness = 180
+threshold = 0.9         # PROBABLITY THRESHOLD
+font = cv.FONT_HERSHEY_SIMPLEX
+##############################################
+
+gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.7)
+sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
+model = tf.keras.models.load_model(r'./trained_model')
+
+def grayscale(img):
+    img = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
+    return img
+def equalize(img):
+    img =cv.equalizeHist(img)
+    return img
+def preprocessing(img):
+    img = grayscale(img)
+    img = equalize(img)
+    img = img/255
+    return img
+def getCalssName(classNo):
+    if   classNo == 0: return 'Speed Limit 30 km/h'
+    elif classNo == 1: return 'Stop'
+    elif classNo == 2: return 'No entry'
+    elif classNo == 3: return 'Bumpy road'
+    elif classNo == 4: return 'Roundabout mandatory'
+    elif classNo == 5: return 'Speed Limit 50 km/h'
+    elif classNo == 6: return 'No passing'
+
+while True:
+    # READ IMAGE
+    cap = img_array[img_index]
+    img_index = (img_index+1) % len(img_array)
+    # PROCESS IMAGE
+    img = np.asarray(cap)
+    img = cv.resize(img, (32, 32))
+    img = preprocessing(img)
+    img = img.reshape(1, 32, 32, 1)
+    # PREDICT IMAGE
+    predictions = model.predict(img)
+    classIndex = model.predict_classes(img)
+    probabilityValue =np.amax(predictions)
+    if probabilityValue > threshold:
+        print(getCalssName(classIndex))
+
