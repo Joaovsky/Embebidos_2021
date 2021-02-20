@@ -135,7 +135,7 @@ def VehicheDetection_UsingMobileNetSSD(filename):
     #cv.destroyAllWindows()
     #out.release()
 
-label_array = ['Speed Limit 30 km/h', 'Stop', 'No entry', 'Bumpy road', 'Roundabout', 'Speed Limit 50 km/h', 'No passing']
+label_array = ['Stop', 'Keep Right', 'Yield']
 
 def grayscale(img):
     img = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
@@ -152,10 +152,6 @@ def preprocessing(img):
     if   classNo == 0: return label_array[0]
     elif classNo == 1: return label_array[1]
     elif classNo == 2: return label_array[2]
-    elif classNo == 3: return label_array[3]
-    elif classNo == 4: return label_array[4]
-    elif classNo == 5: return label_array[5]
-    elif classNo == 6: return label_array[6]
 
 class Ui(QtWidgets.QMainWindow):
     mode=0
