@@ -21,6 +21,8 @@ import numpy as np
 import time
 from PIL import Image
 import os
+from tensorflow.python.client import device_lib
+import datetime
 
 mode=0
 ref=0

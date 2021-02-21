@@ -5,6 +5,7 @@ import time
 from tensorflow.python.client import device_lib
 import datetime
 from PIL import Image
+import time
 #img = Image.open('collision_avoidance.png')
 gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.5)
 sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
@@ -40,12 +41,14 @@ print("GPU device: ", tf.test.gpu_device_name())
 frameWidth= 640         # CAMERA RESOLUTION
 frameHeight = 480
 brightness = 180
-threshold = 0.9         # PROBABLITY THRESHOLD
+threshold = 0.85         # PROBABLITY THRESHOLD
 font = cv.FONT_HERSHEY_SIMPLEX
 ##############################################
 
 # SETUP THE VIDEO CAMERA
-cap = cv.VideoCapture('tsr_2.mp4')
+#cap = cv.VideoCapture('tsr_2.mp4')
+cap = cv.VideoCapture(0)
+
 #while True:
 #cap = img_array[img_index]
 cap.set(3, frameWidth)
@@ -91,13 +94,9 @@ def preprocessing(img):
     img = img/255
     return img
 def getCalssName(classNo):
-    if   classNo == 0: return 'Speed Limit 30 km/h'
-    elif classNo == 1: return 'Stop'
-    elif classNo == 2: return 'No entry'
-    elif classNo == 3: return 'Bumpy road'
-    elif classNo == 4: return 'Roundabout mandatory'
-    elif classNo == 5: return 'Speed Limit 50 km/h'
-    elif classNo == 6: return 'No passing'
+    if   classNo == 0: return 'Stop'
+    elif classNo == 1: return 'Keep Right'
+    elif classNo == 2: return 'Yield'
 
 while True:
     # READ IMAGE
@@ -118,11 +117,13 @@ while True:
     #print("FPS: ", 1.0 / (time.time() - start_time))  # FPS = 1 / time to process loop
     if probabilityValue > threshold:
     #rint(getCalssName(classIndex))
-        cv.putText(imgOrignal, str(classIndex)+" "+str(getCalssName(classIndex)), (120, 35), font, 0.75, (0, 0, 255), 2, cv.LINE_AA)
-        cv.putText(imgOrignal, str(round(probabilityValue*100,2) )+"%", (180, 75), font, 0.75, (0, 0, 255), 2, cv.LINE_AA)
-        cv.putText(imgOrignal, str(1.0 / (time.time() - start_time)), (240, 105), font, 0.75, (0, 0, 255), 2, cv.LINE_AA)
+        #cv.putText(imgOrignal, str(classIndex)+" "+str(getCalssName(classIndex)), (120, 35), font, 0.75, (0, 0, 255), 2, cv.LINE_AA)
+        #cv.putText(imgOrignal, str(round(probabilityValue*100,2) )+"%", (180, 75), font, 0.75, (0, 0, 255), 2, cv.LINE_AA)
+        #cv.putText(imgOrignal, str(1.0 / (time.time() - start_time)), (240, 105), font, 0.75, (0, 0, 255), 2, cv.LINE_AA)
         print(getCalssName(classIndex))
         #cv.imshow("Result", imgOrignal)
     #if cv.waitKey(1) and 0xFF == ord('q'):
         #break
-
+    else:
+        print("No sign")
+    time.sleep(1)
