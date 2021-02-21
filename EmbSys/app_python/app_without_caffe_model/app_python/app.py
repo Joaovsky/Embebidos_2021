@@ -35,7 +35,6 @@ label_array = ['Stop', 'Keep Right', 'Yield']
 
 net = cv.dnn.readNetFromCaffe(prototxt_path, model_path)
 
-
 #############################################
 frameWidth = 640         # CAMERA RESOLUTION
 frameHeight = 480
@@ -117,7 +116,6 @@ class MyTask1(QThread):
         self.done_signal.emit('Foto')
         print("Saida: Tirar foto")
 
-
 class MyTask2(QThread):
     #read imputs from stm
     def __init__(self):
@@ -178,20 +176,12 @@ class MyTask3(QThread):
            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
            "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
            "sofa", "train", "tvmonitor"]
-        self.pix = QPixmap('../app_python/signs/collision_avoidance.png')
-        self.timout_ = 0
         #self.timer.singleShot(5000, lambda: win.CollisionWarningLabel.setPixmap(self.pix))
-        if self.timout_ ==1:
-            self.timer.singleShot(5000, lambda: win.CollisionWarningLabel.setPixmap(self.pix))
-            self.timout_ = 0
-
         QThread.__init__(self)
     def run(self):
         print("Entrada: Verificar se existe carro")
         #self.timer = QTimer()
-
         img = q_cars.get()
-        img = np.asarray(img)
         rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
         (H, W) = img.shape[:2]
         # convert the frame to a blob and pass the blob through the
@@ -216,39 +206,21 @@ class MyTask3(QThread):
                 (startX, startY, endX, endY) = box.astype("int")
                     #find screen dimensions
                 if ((endX - startX)>0.3*W)and((0.3*W)<((endX+startX)/2)<(0.7*W)):
-                    print("Deteta col warning")
-                    self.timout_ = 1
-                    #pix = QPixmap('../app_python/signs/collision_avoidance.png')
-                    #win.CollisionWarningLabel.setPixmap(pix)
+                    print("COLLISION WARNING")
+                    pix = QPixmap('../app_python/signs/collision_avoidance.png')
+                    win.CollisionWarningLabel.setPixmap(pix)
                     win.collision_label.setText('Collision Warning')
                     os.system(f'aplay ../app_python/signs/sound.wav')
-                    #self.timer.singleShot(5000, lambda: self.clean_car_windows)
-                    #self.timer = QTimer()
-                    #self.pix = QPixmap('../app_python/signs/collision_avoidance.png')
-                    #self.timer.singleShot(5000, lambda: win.CollisionWarningLabel.setPixmap(pix))
-                    #self.timer.singleShot(5000, lambda: self.clean_car_windows)
-                    #timer.start()
-                    print("Single shot timer activated 5s")
                     self.done_signal.emit('Obstacle')
-                else:
-                    self.done_signal.emit('NOP')
-        self.clean_car_windows
+        else:
+            self.done_signal.emit('NOP')
         print("Saida: Verificar se existe carros")
-
-    def clean_car_windows(self):
-        self.timer = QTimer()
-        if self.timout_ ==1:
-            self.timer.singleShot(5000, lambda: win.CollisionWarningLabel.setPixmap(self.pix))
-            self.timout_ = 0
-        #win.collision_label.clear()
-        #win.CollisionWarningLabel.clear()
 
 class MyTask4(QThread):
     #Signal Detection
     done_signal = pyqtSignal(str)
     def __init__(self):
-        self.Threshold = 0.98
-        self.timer2 = QTimer()
+        self.Threshold = 0.95
         QThread.__init__(self)
     def run(self):
         print("Entrada: Verificar se existe sinais")
@@ -256,7 +228,6 @@ class MyTask4(QThread):
         global model
         img0 = q_signs.get()
         print("Dps retirar queue")
-        #success, cap2 = img0.read()
         img = np.asarray(img0)
         img = cv.resize(img, (32, 32))
         img = preprocessing(img)
@@ -275,79 +246,70 @@ class MyTask4(QThread):
             pix = QPixmap(signs_path)
             win.Sign_show.setPixmap(pix)
             os.system(audio_path)
-            self.timer2.singleShot(5000, self.clean_sign_windows)
             self.done_signal.emit('Sign')
         else:
             self.done_signal.emit('NOP')
         print("Saida: Verificar se existe sinais")
 
-    def clean_sign_windows(self):
-        win.Sign_show.clear()
-        win.Sign_label.clear()
+def clean_sign_windows():
+    win.Sign_show.clear()
+    win.Sign_label.clear()
+
+def clean_car_windows():
+    win.collision_label.clear()
+    win.CollisionWarningLabel.clear()
 
 def process_done_signal(result):
-    if result == 'Foto': #se já tirou foto->avaliar se é sinal/ obstaculo
-        #shutil.copy2('../app_python/test.jpg','../app_python/foto.jpg')
-        global counter1
-        global counter2
-        #img0 = cv.imread('test.png')
-        #pix= QPixmap("../app_python/test.png")
-        #win.Sign_show.setPixmap(pix)
+    # se já tirou foto->avaliar se é sinal/ obstaculo
+    if result == 'Foto':
+
         task4.start()
         task3.start()
-    elif result == 'Sign':
-        counter1 = 0
-        #timer.start()
-        task1.start()
-    elif result == 'Obstacle':
-        counter2 = 0
-        #timer.start()
-        task1.start()
-    elif result == 'NOP':
-        task1.start()    
 
-class Timer1(QThread):
-    done_signal = pyqtSignal(str)
-    def __init__(self):
-        self.var = 0
-        QThread.__init__(self)
-    def run(self):
-        while True:
-            QThread.msleep(1000)
-            self.done_signal.emit('Time')
-"""      
-def process_timer_signal(result):
-    global counter1
-    global counter2
-    if result == 'Time':
-        counter1 += 1
-        counter2 += 1
-        if counter1 == 5:
-            counter1 = 0
-            win.Sign_show.clear()
-            win.Sign_label.clear()
-        if counter2 == 5:
-            counter2 = 0
-            win.collision_label.clear()
-            win.CollisionWarningLabel.clear()
-"""
+    elif result == 'Sign':
+
+        cleartrafficsign = QTimer()
+        cleartrafficsign.singleShot(2000, clean_sign_windows)
+        task1.start()
+
+    elif result == 'Obstacle':
+
+        clearcarsign = QTimer()
+        clearcarsign.singleShot(2000, clean_car_windows)
+        task1.start()
+
+    elif result == 'NOP':
+        task1.start()
+
 if __name__ == '__main__':
+
+    #Application Start
     app = QApplication(sys.argv)
     win = Ui()
+
+    #Queues Initialization
     q_signs = queue.Queue()
     q_cars = queue.Queue()
-    #timer = timer.Qtimer()
+
+    #Camera Capture Task
     task1 = MyTask1()
     task1.done_signal.connect(process_done_signal)
+
+    #Receive from STM Task
     task2 = MyTask2()
+
+    #Detect vehicles Task
     task3 = MyTask3()
     task3.done_signal.connect(process_done_signal)
+
+    #Detect Transit Signals Task
     task4 = MyTask4()
     task4.done_signal.connect(process_done_signal)
+
+    #Tasks initialization
     task1.start()
     task2.start()
-    
-    
+
     while True:
         app.exec_()
         

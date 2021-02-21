@@ -19,9 +19,7 @@ print("Load MobileNetSSD model")
 
 prototxt_path = "MobileNetSSD_deploy.prototxt"
 model_path = "MobileNetSSD_deploy.caffemodel"
-#file_video = "production ID_4791734.mp4"
 file_video = "cutcartest.mp4"
-
 
 #MobileNetSSD_deploy.prototxt
 #MobileNetSSD_deploy.caffemodel
@@ -32,7 +30,6 @@ CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
            "sofa", "train", "tvmonitor"]
 
 net = cv.dnn.readNetFromCaffe(prototxt_path, model_path)
-
 
 def process_frame_MobileNetSSD(next_frame):
     rgb = cv.cvtColor(next_frame, cv.COLOR_BGR2RGB)
@@ -62,11 +59,8 @@ def process_frame_MobileNetSSD(next_frame):
             # for the object
             box = detections[0, 0, i, 3:7] * np.array([W, H, W, H])
             (startX, startY, endX, endY) = box.astype("int")
-
             cv.rectangle(next_frame, (startX, startY), (endX, endY), (0, 255, 0), 3)
-
     return next_frame
-
 
 def VehicheDetection_UsingMobileNetSSD(filename):
     cap = cv.VideoCapture(filename)
@@ -113,7 +107,7 @@ def VehicheDetection_UsingMobileNetSSD(filename):
     print("FPS: {}".format(fps))
 
     cap.release()
-    cv.destroyAllWindows()
+    #cv.destroyAllWindows()
     out.release()
 
 VehicheDetection_UsingMobileNetSSD(file_video)
