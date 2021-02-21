@@ -102,7 +102,9 @@ def process_frame_MobileNetSSD(next_frame):
     return next_frame
 
 def VehicheDetection_UsingMobileNetSSD(filename):
-    cap = cv.VideoCapture(filename)
+    cap = VideoCapture(0)
+    #cap = cv.VideoCapture(filename)
+
     # Write output file
     #frame_width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
     #frame_height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
@@ -195,7 +197,6 @@ class Ui(QtWidgets.QMainWindow):
         usb_serial.write(str.encode('L'+str(ref)+'\r\n'))
 
 class MyTask1(QThread):
-    #capture image 0.1 s (deamon)
     done_signal = pyqtSignal(str)
     def __init__(self):
         QThread.__init__(self)
@@ -277,7 +278,8 @@ class MyTask3(QThread):
 
 def process_signs_frame_CNN(self):
     # PROCESS IMAGE
-    cap2 = img_array[img_index]
+    #cap2 = img_array[img_index]
+    cap2 = cv.VideoCapture(0)
     img = np.asarray(cap2)
     img = cv.resize(img, (32, 32))
     img = preprocessing(img)

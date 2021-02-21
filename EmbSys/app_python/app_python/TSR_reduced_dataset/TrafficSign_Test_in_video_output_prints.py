@@ -126,4 +126,5 @@ while True:
         #break
     else:
         print("No sign")
+    print(probabilityValue)
     time.sleep(1)
