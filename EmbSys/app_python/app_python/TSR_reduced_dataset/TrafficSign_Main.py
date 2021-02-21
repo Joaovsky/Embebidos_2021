@@ -22,7 +22,7 @@ path = "myData" # folder with all the class folders
 labelFile = 'labels.csv' # file with all names of classes
 batch_size_val=50  # how many to process together
 #steps_per_epoch_val=2000
-epochs_val=1
+epochs_val=50
 imageDimesions = (32,32,3)
 testRatio = 0.2    # if 1000 images split will 200 for testing
 validationRatio = 0.2 # if 1000 images 20% of remaining 800 will be 160 for validation
@@ -102,7 +102,7 @@ def preprocessing(img):
 X_train=np.array(list(map(preprocessing,X_train)))  # TO IRETATE AND PREPROCESS ALL IMAGES
 X_validation=np.array(list(map(preprocessing,X_validation)))
 X_test=np.array(list(map(preprocessing,X_test)))
-cv2.imshow("GrayScale Images",X_train[random.randint(0,len(X_train)-1)]) # TO CHECK IF THE TRAINING IS DONE PROPERLY
+#cv2.imshow("GrayScale Images",X_train[random.randint(0,len(X_train)-1)]) # TO CHECK IF THE TRAINING IS DONE PROPERLY
 ############################### ADD A DEPTH OF 1
 X_train=X_train.reshape(X_train.shape[0],X_train.shape[1],X_train.shape[2],1)
 X_validation=X_validation.reshape(X_validation.shape[0],X_validation.shape[1],X_validation.shape[2],1)
@@ -127,6 +127,7 @@ y_train = to_categorical(y_train,noOfClasses)
 y_validation = to_categorical(y_validation,noOfClasses)
 y_test = to_categorical(y_test,noOfClasses)
 ############################### CONVOLUTION NEURAL NETWORK MODEL
+"""
 def myModel():
     no_Of_Filters=60
     size_of_Filter=(5,5) # THIS IS THE KERNEL THAT MOVE AROUND THE IMAGE TO GET THE FEATURES.
@@ -149,12 +150,38 @@ def myModel():
     # COMPILE MODEL
     model.compile(Adam(lr=0.001),loss='categorical_crossentropy',metrics=['accuracy'])
     return model
+"""
+def myModel():
+    no_Of_Filters=60
+    size_of_Filter=(5,5) # THIS IS THE KERNEL THAT MOVE AROUND THE IMAGE TO GET THE FEATURES.
+                         # THIS WOULD REMOVE 2 PIXELS FROM EACH BORDER WHEN USING 32 32 IMAGE
+    size_of_Filter2=(3,3)
+    size_of_pool=(2,2)  # SCALE DOWN ALL FEATURE MAP TO GERNALIZE MORE, TO REDUCE OVERFITTING
+    no_Of_Nodes = 500   # NO. OF NODES IN HIDDEN LAYERS
+    model= Sequential()
+    model.add((Conv2D(no_Of_Filters,size_of_Filter,input_shape=(imageDimesions[0],imageDimesions[1],1),activation='relu')))  # ADDING MORE CONVOLUTION LAYERS = LESS FEATURES BUT CAN CAUSE ACCURACY TO INCREASE
+    model.add((Conv2D(no_Of_Filters, size_of_Filter, activation='relu')))
+    model.add(Dropout(0.5))
+    model.add(MaxPooling2D(pool_size=size_of_pool)) # DOES NOT EFFECT THE DEPTH/NO OF FILTERS
+    model.add((Conv2D(no_Of_Filters//2, size_of_Filter2,activation='relu')))
+    model.add(Dropout(0.5))
+    model.add((Conv2D(no_Of_Filters // 2, size_of_Filter2, activation='relu')))
+    model.add(MaxPooling2D(pool_size=size_of_pool))
+    model.add(Dropout(0.5))
+    model.add(Flatten())
+    model.add(Dense(no_Of_Nodes,activation='relu'))
+    model.add(Dropout(0.5)) # INPUTS NODES TO DROP WITH EACH UPDATE 1 ALL 0 NONE
+    model.add(Dense(noOfClasses,activation='softmax')) # OUTPUT LAYER
+    # COMPILE MODEL
+    model.compile(Adam(lr=0.001),loss='categorical_crossentropy',metrics=['accuracy'])
+    return model
+
 ############################### TRAIN
 model = myModel()
 print(model.summary())
 #history=model.fit_generator(dataGen.flow(X_train,y_train,batch_size=batch_size_val),steps_per_epoch=steps_per_epoch_val,epochs=epochs_val,validation_data=(X_validation,y_validation),shuffle=1)
-#history=model.fit_generator(dataGen.flow(X_train,y_train,batch_size=batch_size_val),epochs=epochs_val,validation_data=(X_validation,y_validation),shuffle=1)
-history = model.fit(X_train, y_train, batch_size = batch_size_val, epochs = epochs_val, validation_data=(X_validation,y_validation), shuffle = 1)
+history=model.fit_generator(dataGen.flow(X_train,y_train,batch_size=batch_size_val),epochs=epochs_val,validation_data=(X_validation,y_validation),shuffle=1)
+#history = model.fit(X_train, y_train, batch_size = batch_size_val, epochs = epochs_val, validation_data=(X_validation,y_validation), shuffle = 1)
 
 ############################### PLOT
 plt.figure(1)
