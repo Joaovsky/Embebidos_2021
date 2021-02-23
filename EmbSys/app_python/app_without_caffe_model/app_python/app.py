@@ -97,7 +97,7 @@ class Ui(QtWidgets.QMainWindow):
         ref=value
         usb_serial.write(str.encode('L'+str(ref)+'\r\n'))
 
-class MyTask1(QThread):
+class capture_img_thread(QThread):
     #capture image
     done_signal = pyqtSignal(str)
     def __init__(self):
@@ -116,11 +116,13 @@ class MyTask1(QThread):
         self.done_signal.emit('Foto')
         print("Saida: Tirar foto")
 
-class MyTask2(QThread):
+class receive_from_stm_thread(QThread):
     #read imputs from stm
     def __init__(self):
         QThread.__init__(self)
     def run(self):
+        print("Entrada: Receive from STM")
+
         global ref
         global setpoint
         global actual_lux
@@ -166,9 +168,10 @@ class MyTask2(QThread):
                     elif len(readed)<4:
                         actual_hum = chr(readed[1])
                         win.humidity_val.setNum(int(actual_hum))
-            QThread.msleep(50)
+            #QThread.msleep(50)
+        print("Saida: Receive from STM")
 
-class MyTask3(QThread):
+class detect_cars_thread(QThread):
     #Obstacle Detection
     done_signal = pyqtSignal(str)
     def __init__(self):
@@ -216,7 +219,7 @@ class MyTask3(QThread):
             self.done_signal.emit('NOP')
         print("Saida: Verificar se existe carros")
 
-class MyTask4(QThread):
+class detect_signals_thread(QThread):
     #Signal Detection
     done_signal = pyqtSignal(str)
     def __init__(self):
@@ -263,23 +266,23 @@ def process_done_signal(result):
     # se já tirou foto->avaliar se é sinal/ obstaculo
     if result == 'Foto':
 
-        task4.start()
-        task3.start()
+        detect_signals.start()
+        detect_vehicles.start()
 
     elif result == 'Sign':
 
         cleartrafficsign = QTimer()
         cleartrafficsign.singleShot(2000, clean_sign_windows)
-        task1.start()
+        img_capture.start()
 
     elif result == 'Obstacle':
 
         clearcarsign = QTimer()
         clearcarsign.singleShot(2000, clean_car_windows)
-        task1.start()
+        img_capture.start()
 
     elif result == 'NOP':
-        task1.start()
+        img_capture.start()
 
 if __name__ == '__main__':
 
@@ -292,23 +295,23 @@ if __name__ == '__main__':
     q_cars = queue.Queue()
 
     #Camera Capture Task
-    task1 = MyTask1()
-    task1.done_signal.connect(process_done_signal)
+    img_capture = capture_img_thread()
+    img_capture.done_signal.connect(process_done_signal)
 
     #Receive from STM Task
-    task2 = MyTask2()
+    receive_from_stm = receive_from_stm_thread()
 
     #Detect vehicles Task
-    task3 = MyTask3()
-    task3.done_signal.connect(process_done_signal)
+    detect_vehicles = detect_cars_thread()
+    detect_vehicles.done_signal.connect(process_done_signal)
 
     #Detect Transit Signals Task
-    task4 = MyTask4()
-    task4.done_signal.connect(process_done_signal)
+    detect_signals = detect_signals_thread()
+    detect_signals.done_signal.connect(process_done_signal)
 
     #Tasks initialization
-    task1.start()
-    task2.start()
+    img_capture.start()
+    receive_from_stm.start()
 
     while True:
         app.exec_()
